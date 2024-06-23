@@ -17,6 +17,17 @@ app.use(bodyParser.json())
 
 app.use('/users', userRoute)
 
+app.use((req, res, next) => {
+    const error = app.get('env') === 'development' ? err : {}
+    const status = err.status || 500
+
+    return res.status(status).json({
+        error: {
+            message: error.message
+        }
+    })
+})
+
 app.use('/', (req, res, next) => {
     return res.status(200).json({
         message: 'Server is Okkk and running...'
