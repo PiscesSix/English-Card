@@ -15,7 +15,7 @@ const getUser = async (req, res, next) => {
 
 const newUser = async (req, res, next) => {
     try {
-        const user = new User(req.body)
+        const user = new User(req.value.body)
         await user.save()
         return res.status(201).json({
             message: 'User saved successfully',
@@ -28,7 +28,7 @@ const newUser = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
     try {
-        const { userId } = req.params
+        const { userId } = req.value.params
         const user = await User.findById(userId)
         return res.status(200).json({user})
     } catch (error) {
@@ -38,7 +38,7 @@ const getUserById = async (req, res, next) => {
 
 const replaceUser = async (req, res, next) => {
     try {
-        const { userId } = req.params
+        const { userId } = req.value.params
         const newUser = req.body
         const result = await User.findByIdAndUpdate(userId, newUser)
         return res.status(200).json({success: true, result: result})
@@ -49,7 +49,7 @@ const replaceUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     try {
-        const { userId } = req.params
+        const { userId } = req.value.params
         const newUser = req.body
         const result = await User.findByIdAndUpdate(userId, newUser)
         return res.status(200).json({success: true, result: result})
@@ -60,7 +60,7 @@ const updateUser = async (req, res, next) => {
 
 const getUserDecks = async (req, res, next) => {
     try {
-        const { userId } = req.params
+        const { userId } = req.value.params
         const { decks } = await User.findById(userId).populate('decks')
         return res.status(200).json({decks})
 
@@ -71,8 +71,8 @@ const getUserDecks = async (req, res, next) => {
 
 const newUserDeck = async (req, res, next) => {
     try {
-        const { userId } = req.params
-        const newDeck = new Deck(req.body)
+        const { userId } = req.value.params
+        const newDeck = new Deck(req.value.body)
         const user = await User.findById(userId)
 
         newDeck.owner = user

@@ -3,17 +3,19 @@ const router = express.Router()
 
 const UserController = require('../controllers/user')
 
+const { validateBody, validateParam, schemas } = require('../helpers/routeHelpers')
+
 router.route('/')
     .get(UserController.getAll)
-    .post(UserController.newUser)
+    .post(validateBody(schemas.userSchema), UserController.newUser)
 
 router.route('/:userId')
-    .get(UserController.getUser)
-    .put(UserController.replaceUser)
-    .patch(UserController.updateUser)
+    .get(validateParam(schemas.idSchema,'userId'), UserController.getUser)
+    .put(validateParam(schemas.idSchema,'userId'), validateBody(schemas.userSchema), UserController.replaceUser)
+    .patch(validateParam(schemas.idSchema,'userId'), validateBody(schemas.userOptionalSchema), UserController.updateUser)
 
 router.route('/:userId/decks')
-    .get(UserController.getUserDecks)
-    .post(UserController.newUserDeck)
+    .get(validateParam(schemas.idSchema, 'userId'), UserController.getUserDecks)
+    .post(validateParam(schemas.idSchema, 'userId'), validateBody(schemas.deckSchema), UserController.newUserDeck)
     
 module.exports = router
