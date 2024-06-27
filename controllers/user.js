@@ -39,7 +39,7 @@ const getUserById = async (req, res, next) => {
 const replaceUser = async (req, res, next) => {
     try {
         const { userId } = req.value.params
-        const newUser = req.body
+        const newUser = req.value.body
         const result = await User.findByIdAndUpdate(userId, newUser)
         return res.status(200).json({success: true, result: result})
     } catch (error) {

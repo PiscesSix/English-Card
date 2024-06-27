@@ -11,11 +11,13 @@ mongoClient.connect("mongodb://127.0.0.1:27017/englishDB")
 const app = express()
 
 const userRoute = require('./routes/user')
+const deckRoute = require('./routes/deck')
 
 app.use(morgan('dev'))
 app.use(bodyParser.json())
 
 app.use('/users', userRoute)
+app.use('/decks', deckRoute)
 
 app.use((req, res, next) => {
     const error = app.get('env') === 'development' ? err : {}
