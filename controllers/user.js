@@ -1,5 +1,17 @@
+const { set } = require('mongoose')
 const Deck = require('../models/Deck')
 const User = require('../models/User')
+
+const JWT = require('jsonwebtoken')
+
+const signToken = user => {
+    return JWT.sign({
+        iss: 'william Tri',
+        sub: user._id,
+        iat: new Date().getTime(),
+        exp: new Date().setDate(new Date().getDate() + 3)
+    }, 'MySecretKey')
+}
 
 const getUser = async (req, res, next) => {
     try {
@@ -87,6 +99,44 @@ const newUserDeck = async (req, res, next) => {
     }
 }
 
+const secret = async (req, res, next) => {
+    return res.status(200).json({ resource: true })
+}
+
+const signIn = async (req, res, next) => {
+    const token = signToken(req.user._id)
+    console.log('token', token)
+
+    res.setHeader('authorization', token)
+
+    return res.status(200).json({
+        message: 'You successfully signed in!',
+    })
+}
+
+const signUp = async (req, res, next) => {
+    try {
+        const { firstName, lastName, email, password } = req.value.body
+        const findEmail = await User.findOne({email})
+        if (findEmail) {
+            return res.status(403).json({error: 'Email is already in use'})
+        }
+    
+        const newUser = new User({firstName, lastName, email, password})
+        await newUser.save()
+
+        const token = signToken(newUser)
+        res.setHeader('authorization', token)
+
+        return res.status(201).json({
+            success: true,
+            user: newUser
+        })
+    } catch (error) {
+        next(error)
+    }   
+}
+
 module.exports = {
     getAll: getUser,
     newUser: newUser,
@@ -95,4 +145,7 @@ module.exports = {
     updateUser: updateUser,
     getUserDecks: getUserDecks,
     newUserDeck: newUserDeck,
+    secret: secret,
+    signIn: signIn,
+    signUp: signUp
 }
