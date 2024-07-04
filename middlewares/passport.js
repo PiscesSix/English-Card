@@ -7,7 +7,7 @@ const user = require('../controllers/user');
 
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey: 'MySecretKey'
+    secretOrKey: process.env.JWT_SECRET
 }, async (payload, done) => {
     try {
         const user = await User.findById(payload.sub)
@@ -35,4 +35,35 @@ passport.use(new LocalStrategy({
         done(null, user)
     } catch (error) {
         done(error, false)}
+}))
+
+passport.use('googleToken', new GooglePluTokenStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        // In google Oauthen
+        const user = await User.findOne({authGoogleID: profile.id, authType: 'google'})
+        if (user) {
+            return done(null, user)
+        }
+        
+        // In account
+        const userInAccountWithEmail = await User.findOne({email: profile.emails[0].value})
+        if (userInAccountWithEmail) {
+            return done(null, userInAccountWithEmail)
+        }
+
+        const newUser = new User({
+            authGoogleID: profile.id,
+            authType: 'google',
+            firstName: profile.name.givenName,
+            lastName: profile.name.familyName,
+            email: profile.emails[0].value
+        })
+        await newUser.save()
+        done(null, newUser)
+    } catch (error) {
+        done(error, false, error.message)
+    }
 }))

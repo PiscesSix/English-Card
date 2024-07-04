@@ -10,7 +10,7 @@ const signToken = user => {
         sub: user._id,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() + 3)
-    }, 'MySecretKey')
+    }, process.env.JWT_SECRET)
 }
 
 const getUser = async (req, res, next) => {

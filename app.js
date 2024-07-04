@@ -1,9 +1,8 @@
+require('dotenv').config()
 const bodyParser = require('body-parser')
 const express = require('express')
 const morgan = require('morgan')
 const mongoClient = require('mongoose')
-
-
 mongoClient.connect("mongodb://127.0.0.1:27017/englishDB")
     .then(() => console.log('Connected database from mongodb'))
     .catch(() => console.log('Error in connecting database from mongodb'))
